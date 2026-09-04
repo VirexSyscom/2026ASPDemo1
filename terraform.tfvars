@@ -22,7 +22,7 @@ onprem_address_spaces = [
   "192.168.20.0/24"
 ]
 
-vpn_gateway_sku = "VpnGw1"
+vpn_gateway_sku = "VpnGw1AZ"
 bastion_sku     = "Basic"
 enable_bgp      = false
 
