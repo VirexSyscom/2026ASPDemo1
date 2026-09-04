@@ -50,11 +50,6 @@ variable "onprem_address_spaces" {
   default     = ["192.168.0.0/16"]
 }
 
-variable "vpn_shared_key" {
-  description = "IPsec pre-shared key"
-  type        = string
-  sensitive   = true
-}
 
 variable "vpn_gateway_sku" {
   description = "Azure VPN Gateway SKU"
