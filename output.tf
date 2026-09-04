@@ -1,15 +1,49 @@
 output "resource_group_name" {
-  value = azurerm_resource_group.rg.name
+  description = "Resource Group name"
+  value       = azurerm_resource_group.hub.name
 }
 
-output "virtual_network_name" {
-  value = azurerm_virtual_network.test.name
+output "hub_vnet_id" {
+  description = "Hub-VNET resource ID"
+  value       = azurerm_virtual_network.hub.id
 }
 
-output "subnet_name" {
-  value = azurerm_subnet.test.name
+output "hub_vnet_name" {
+  description = "Hub-VNET name"
+  value       = azurerm_virtual_network.hub.name
 }
 
-output "linux_virtual_machine_names" {
-  value = [for s in azurerm_linux_virtual_machine.test : s.name[*]]
+output "bastion_host_id" {
+  description = "Azure Bastion resource ID"
+  value       = azurerm_bastion_host.hub.id
+}
+
+output "bastion_public_ip" {
+  description = "Azure Bastion public IP address"
+  value       = azurerm_public_ip.bastion.ip_address
+}
+
+output "vpn_gateway_id" {
+  description = "Virtual Network Gateway resource ID"
+  value       = azurerm_virtual_network_gateway.vpn.id
+}
+
+output "vpn_gateway_public_ip" {
+  description = "VPN Gateway public IP address"
+  value       = azurerm_public_ip.vpn_gateway.ip_address
+}
+
+output "local_network_gateway_id" {
+  description = "Local Network Gateway resource ID"
+  value       = azurerm_local_network_gateway.fortigate.id
+}
+
+output "vpn_connection_id" {
+  description = "Site-to-Site VPN Connection resource ID"
+  value       = azurerm_virtual_network_gateway_connection.fortigate.id
+}
+
+output "vpn_connection_name" {
+  description = "Site-to-Site VPN Connection name"
+  value       = azurerm_virtual_network_gateway_connection.fortigate.name
 }
