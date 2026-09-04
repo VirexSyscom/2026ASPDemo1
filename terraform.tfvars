@@ -26,6 +26,12 @@ vpn_gateway_sku = "VpnGw2AZ"
 bastion_sku     = "Basic"
 enable_bgp      = false
 
+vpn_gateway_public_ip_zones = [
+  "1",
+  "2",
+  "3"
+]
+
 # 暫時不建立 ToFortiVPN
 create_vpn_connection = false
 
