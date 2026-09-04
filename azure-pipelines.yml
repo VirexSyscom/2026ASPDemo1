@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  vmImage: ReDeployAgentPool
+  name: ReDeployAgentPool
 
 
 steps:
