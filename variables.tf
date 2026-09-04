@@ -54,7 +54,7 @@ variable "onprem_address_spaces" {
 variable "vpn_gateway_sku" {
   description = "Azure VPN Gateway SKU"
   type        = string
-  default     = "VpnGw1"
+  default     = "VpnGw1AZ"
 
   validation {
     condition = contains([
