@@ -80,6 +80,33 @@ variable "vpn_gateway_sku" {
   }
 }
 
+
+variable "create_vpn_connection" {
+  description = "是否建立 Site-to-Site VPN Connection"
+  type        = bool
+  default     = false
+}
+
+variable "vpn_shared_key" {
+  description = "IPsec Pre-Shared Key。只有建立 VPN Connection 時才需要。"
+  type        = string
+  sensitive   = true
+  default     = null
+
+  validation {
+    condition = (
+      var.create_vpn_connection == false ||
+      (
+        var.vpn_shared_key != null &&
+        length(trimspace(var.vpn_shared_key)) > 0
+      )
+    )
+
+    error_message = "create_vpn_connection 為 true 時，必須提供非空白的 vpn_shared_key。"
+  }
+}
+
+
 variable "bastion_sku" {
   description = "Azure Bastion SKU"
   type        = string
@@ -109,27 +136,3 @@ variable "tags" {
   }
 }
 
-variable "create_vpn_connection" {
-  description = "是否建立 Site-to-Site VPN Connection"
-  type        = bool
-  default     = false
-}
-
-variable "vpn_shared_key" {
-  description = "IPsec Pre-Shared Key。只有建立 VPN Connection 時才需要。"
-  type        = string
-  sensitive   = true
-  default     = null
-
-  validation {
-    condition = (
-      var.create_vpn_connection == false ||
-      (
-        var.vpn_shared_key != null &&
-        length(trimspace(var.vpn_shared_key)) > 0
-      )
-    )
-
-    error_message = "create_vpn_connection 為 true 時，必須提供非空白的 vpn_shared_key。"
-  }
-}
