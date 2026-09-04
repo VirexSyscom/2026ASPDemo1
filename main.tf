@@ -86,6 +86,7 @@ resource "azurerm_bastion_host" "hub" {
 # 7. VPNGateway-IPaddress
 # ------------------------------------------------------------
 
+
 resource "azurerm_public_ip" "vpn_gateway" {
   name                = "VPNGateway-IPaddress"
   location            = azurerm_resource_group.hub.location
@@ -94,7 +95,7 @@ resource "azurerm_public_ip" "vpn_gateway" {
   allocation_method = "Static"
   sku               = "Standard"
   ip_version        = "IPv4"
-　zones = var.vpn_gateway_public_ip_zones
+  zones             = var.vpn_gateway_public_ip_zones
 
   tags = var.tags
 }
