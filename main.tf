@@ -94,6 +94,7 @@ resource "azurerm_public_ip" "vpn_gateway" {
   allocation_method = "Static"
   sku               = "Standard"
   ip_version        = "IPv4"
+　zones = var.vpn_gateway_public_ip_zones
 
   tags = var.tags
 }
