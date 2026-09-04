@@ -11,10 +11,31 @@ pool:
 
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: TerraformTask@5
+  displayName: terraform init
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendAzureRmUseEntraIdForAuthentication: false
+    backendServiceArm: 'ReDeployPip1'
+    backendAzureRmOverrideSubscriptionID: '$(SubID)'
+    backendAzureRmResourceGroupName: '$(SARG)'
+    backendAzureRmStorageAccountName: '$(SAName)'
+    backendAzureRmContainerName: '$(CName)'
+    backendAzureRmKey: '$(SAKey)'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: TerraformTask@5
+  displayName: terraform plan
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    environmentServiceNameAzureRM: 'ReDeployPip1'
+    environmentAzureRmOverrideSubscriptionID: '$(SubID)'
+
+- task: TerraformTask@5
+  displayName: terraform apply
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    environmentServiceNameAzureRM: 'ReDeployPip1'
+    environmentAzureRmOverrideSubscriptionID: '$(SubID)'
