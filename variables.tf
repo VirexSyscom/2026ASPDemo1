@@ -1,17 +1,110 @@
-variable "resource_group_location" {
+variable "subscription_id" {
+  description = "Azure Subscription ID"
   type        = string
-  description = "Location for all resources."
-  default     = "japaneast"
+  default     = null
 }
 
-variable "resource_group_name_prefix" {
+variable "resource_group_name" {
+  description = "Resource Group name"
   type        = string
-  description = "Prefix of the resource group name that's combined with a random ID so name is unique in your Azure subscription."
-  default     = "rg"
+  default     = "rg-hub-network-jpe"
 }
 
-variable "username" {
+variable "location" {
+  description = "Azure Region"
   type        = string
-  description = "The username for the local account that will be created on the new VM."
-  default     = "azureadmin"
+  default     = "Japan East"
+}
+
+variable "hub_vnet_address_space" {
+  description = "Address space of Hub-VNET"
+  type        = list(string)
+  default     = ["10.0.0.0/16"]
+}
+
+variable "bastion_subnet_prefixes" {
+  description = "CIDR for AzureBastionSubnet"
+  type        = list(string)
+  default     = ["10.0.0.0/26"]
+}
+
+variable "gateway_subnet_prefixes" {
+  description = "CIDR for GatewaySubnet"
+  type        = list(string)
+  default     = ["10.0.1.0/27"]
+}
+
+variable "onprem_vpn_public_ip" {
+  description = "Public IP address of the on-premises FortiGate"
+  type        = string
+
+  validation {
+    condition     = can(cidrhost("${var.onprem_vpn_public_ip}/32", 0))
+    error_message = "onprem_vpn_public_ip 必須是有效的 IPv4 位址。"
+  }
+}
+
+variable "onprem_address_spaces" {
+  description = "On-premises networks behind the FortiGate"
+  type        = list(string)
+  default     = ["192.168.0.0/16"]
+}
+
+variable "vpn_shared_key" {
+  description = "IPsec pre-shared key"
+  type        = string
+  sensitive   = true
+}
+
+variable "vpn_gateway_sku" {
+  description = "Azure VPN Gateway SKU"
+  type        = string
+  default     = "VpnGw1"
+
+  validation {
+    condition = contains([
+      "Basic",
+      "VpnGw1",
+      "VpnGw2",
+      "VpnGw3",
+      "VpnGw4",
+      "VpnGw5",
+      "VpnGw1AZ",
+      "VpnGw2AZ",
+      "VpnGw3AZ",
+      "VpnGw4AZ",
+      "VpnGw5AZ"
+    ], var.vpn_gateway_sku)
+
+    error_message = "請指定有效的 VPN Gateway SKU。"
+  }
+}
+
+variable "bastion_sku" {
+  description = "Azure Bastion SKU"
+  type        = string
+  default     = "Basic"
+
+  validation {
+    condition     = contains(["Basic", "Standard", "Premium"], var.bastion_sku)
+    error_message = "bastion_sku 必須是 Basic、Standard 或 Premium。"
+  }
+}
+
+variable "enable_bgp" {
+  description = "Enable BGP on Azure VPN Gateway"
+  type        = bool
+  default     = false
+}
+
+variable "tags" {
+  description = "Common resource tags"
+  type        = map(string)
+
+  default = {
+    Environment = "Demo"
+    ManagedBy   = "Terraform"
+    Workload    = "Hub-Network"
+    Region      = "Japan-East"
+  }
 }
