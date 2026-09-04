@@ -75,6 +75,12 @@ variable "vpn_gateway_sku" {
   }
 }
 
+variable "vpn_gateway_public_ip_zones" {
+  description = "VPN Gateway Standard Public IP 的 Availability Zones"
+  type        = list(string)
+  default     = ["1", "2", "3"]
+}
+
 
 variable "create_vpn_connection" {
   description = "是否建立 Site-to-Site VPN Connection"
