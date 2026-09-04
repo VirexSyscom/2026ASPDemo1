@@ -40,10 +40,21 @@ output "local_network_gateway_id" {
 
 output "vpn_connection_id" {
   description = "Site-to-Site VPN Connection resource ID"
-  value       = azurerm_virtual_network_gateway_connection.fortigate.id
+  value = try(
+    azurerm_virtual_network_gateway_connection.fortigate[0].id,
+    null
+  )
 }
 
 output "vpn_connection_name" {
   description = "Site-to-Site VPN Connection name"
-  value       = azurerm_virtual_network_gateway_connection.fortigate.name
+  value = try(
+    azurerm_virtual_network_gateway_connection.fortigate[0].name,
+    null
+  )
+}
+
+output "vpn_connection_created" {
+  description = "是否已建立 Site-to-Site VPN Connection"
+  value       = var.create_vpn_connection
 }
