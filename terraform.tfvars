@@ -26,6 +26,9 @@ vpn_gateway_sku = "VpnGw1"
 bastion_sku     = "Basic"
 enable_bgp      = false
 
+# 暫時不建立 ToFortiVPN
+create_vpn_connection = false
+
 tags = {
   Environment = "Demo"
   ManagedBy   = "Terraform"
