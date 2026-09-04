@@ -147,6 +147,8 @@ resource "azurerm_local_network_gateway" "fortigate" {
 # ------------------------------------------------------------
 
 resource "azurerm_virtual_network_gateway_connection" "fortigate" {
+  count = var.create_vpn_connection ? 1 : 0
+
   name                = "ToFortiVPN"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
