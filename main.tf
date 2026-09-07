@@ -14,7 +14,7 @@ locals {
 # ------------------------------------------------------------
 
 resource "azurerm_resource_group" "hub" {
-  name     = "${local.name_prefix}-${var.resource_group_name}"
+  name     = var.resource_group_name
   location = var.location
   tags     = local.common_tags
 }
