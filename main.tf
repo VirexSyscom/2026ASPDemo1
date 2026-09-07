@@ -1,12 +1,22 @@
-# ------------------------------------------------------------
-# Resource Group
-# 此資源不在原始圖片中，但所有圖片內資源都必須隸屬於 Resource Group。
+locals {
+  name_prefix = trim(var.resource_name_prefix, "-")
+
+  common_tags = merge(
+    {
+      NamePrefix = local.name_prefix
+      Region     = var.location
+    },
+    var.tags
+  )
+}
+
+
 # ------------------------------------------------------------
 
 resource "azurerm_resource_group" "hub" {
-  name     = var.resource_group_name
+  name     = "${local.name_prefix}-${var.resource_group_name}"
   location = var.location
-  tags     = var.tags
+  tags     = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -14,12 +24,12 @@ resource "azurerm_resource_group" "hub" {
 # ------------------------------------------------------------
 
 resource "azurerm_virtual_network" "hub" {
-  name                = "Hub-VNET"
+  name                = "${local.name_prefix}-Hub-VNET"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
   address_space       = var.hub_vnet_address_space
 
-  tags = var.tags
+  tags = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -52,15 +62,14 @@ resource "azurerm_subnet" "gateway" {
 # ------------------------------------------------------------
 
 resource "azurerm_public_ip" "bastion" {
-  name                = "hub-vnet-bastion-IPaddress"
+  name                = "${local.name_prefix}-hub-vnet-bastion-pip"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  ip_version          = "IPv4"
 
-  allocation_method = "Static"
-  sku               = "Standard"
-  ip_version        = "IPv4"
-
-  tags = var.tags
+  tags = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -68,18 +77,18 @@ resource "azurerm_public_ip" "bastion" {
 # ------------------------------------------------------------
 
 resource "azurerm_bastion_host" "hub" {
-  name                = "Hub-VNET-Bastion"
+  name                = "${local.name_prefix}-hub-vnet-bastion"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
   sku                 = var.bastion_sku
 
   ip_configuration {
-    name                 = "bastion-ip-configuration"
+    name                 = "${local.name_prefix}-bastion-ipconfig"
     subnet_id            = azurerm_subnet.bastion.id
     public_ip_address_id = azurerm_public_ip.bastion.id
   }
 
-  tags = var.tags
+  tags = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -88,16 +97,15 @@ resource "azurerm_bastion_host" "hub" {
 
 
 resource "azurerm_public_ip" "vpn_gateway" {
-  name                = "VPNGateway-IPaddress"
+  name                = "${local.name_prefix}-vpn-gateway-pip"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  ip_version          = "IPv4"
+  zones               = var.vpn_gateway_public_ip_zones
 
-  allocation_method = "Static"
-  sku               = "Standard"
-  ip_version        = "IPv4"
-  zones             = var.vpn_gateway_public_ip_zones
-
-  tags = var.tags
+  tags = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -106,7 +114,7 @@ resource "azurerm_public_ip" "vpn_gateway" {
 # ------------------------------------------------------------
 
 resource "azurerm_virtual_network_gateway" "vpn" {
-  name                = "VPNGateway"
+  name                = "${local.name_prefix}-vpn-gateway"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
 
@@ -118,13 +126,13 @@ resource "azurerm_virtual_network_gateway" "vpn" {
   generation    = "Generation2"
 
   ip_configuration {
-    name                          = "vpn-gateway-ip-configuration"
+    name                          = "${local.name_prefix}-vpn-gateway-ipconfig"
     public_ip_address_id          = azurerm_public_ip.vpn_gateway.id
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = azurerm_subnet.gateway.id
   }
 
-  tags = var.tags
+  tags = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -133,14 +141,14 @@ resource "azurerm_virtual_network_gateway" "vpn" {
 # ------------------------------------------------------------
 
 resource "azurerm_local_network_gateway" "fortigate" {
-  name                = "LocalGateway"
+  name = "${local.name_prefix}-fortigate-local-gateway"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
 
   gateway_address = var.onprem_vpn_public_ip
   address_space   = var.onprem_address_spaces
 
-  tags = var.tags
+  tags = local.common_tags
 }
 
 # ------------------------------------------------------------
@@ -151,18 +159,17 @@ resource "azurerm_local_network_gateway" "fortigate" {
 resource "azurerm_virtual_network_gateway_connection" "fortigate" {
   count = var.create_vpn_connection ? 1 : 0
 
-  name                = "ToFortiVPN"
+  name                = "${local.name_prefix}-to-fortigate-vpn"
   location            = azurerm_resource_group.hub.location
   resource_group_name = azurerm_resource_group.hub.name
 
-  type = "IPsec"
-
+  type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.vpn.id
   local_network_gateway_id   = azurerm_local_network_gateway.fortigate.id
 
   shared_key = var.vpn_shared_key
-
   enable_bgp = var.enable_bgp
+
 
   # 若 FortiGate 有指定 IKE/IPsec Proposal，可取消下面區塊註解，
   # 並依 FortiGate Phase 1 / Phase 2 設定調整。
@@ -178,5 +185,5 @@ resource "azurerm_virtual_network_gateway_connection" "fortigate" {
   #   sa_lifetime      = 27000
   # }
 
-  tags = var.tags
+  tags = local.common_tags
 }
