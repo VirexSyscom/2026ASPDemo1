@@ -5,6 +5,7 @@ location_short = "jpe"
 
 resource_group_name   = "hub-network-rg"
 create_resource_group = true
+
 hub_vnet_address_space = [
   "10.0.0.0/16"
 ]
