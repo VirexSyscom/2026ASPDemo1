@@ -1,6 +1,6 @@
 resource_name_prefix = "demo"
 
-resource_group_name = "rg-hub-network-jpe"
+resource_group_name = "hub-network-rg"
 location            = "Japan East"
 
 hub_vnet_address_space = [
