@@ -22,7 +22,7 @@ variable "resource_name_prefix" {
 variable "resource_group_name" {
   description = "Resource Group base name without prefix"
   type        = string
-  default     = "rg-hub-network-jpe"
+  default     = "hub-network-rg"
 }
 
 variable "location" {
