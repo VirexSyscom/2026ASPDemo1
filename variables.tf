@@ -4,8 +4,23 @@ variable "subscription_id" {
   default     = null
 }
 
+variable "resource_name_prefix" {
+  description = "Prefix added to Azure resource names"
+  type        = string
+  default     = "demo"
+
+  validation {
+    condition = (
+      length(trimspace(var.resource_name_prefix)) > 0 &&
+      can(regex("^[A-Za-z0-9-]+$", var.resource_name_prefix))
+    )
+    error_message = "resource_name_prefix 只能包含英文字母、數字與連字號，且不可為空白。"
+  }
+}
+
+
 variable "resource_group_name" {
-  description = "Resource Group name"
+  description = "Resource Group base name without prefix"
   type        = string
   default     = "rg-hub-network-jpe"
 }
